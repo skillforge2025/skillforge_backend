@@ -6,8 +6,6 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -23,7 +21,6 @@ import lombok.Setter;
 @Setter
 public class Instructor {
 	@Id
-	@Column(name = "instructor_id")
 	private Long instructorId;
 	@OneToOne
 	@MapsId
@@ -32,7 +29,7 @@ public class Instructor {
 	private String expertise;
 	@Column(length = 500, nullable = true)
 	private String bio;
-	@OneToMany(mappedBy = "instructor",cascade = CascadeType.ALL,orphanRemoval = true)
-	private List<Course>courses=new ArrayList<>();
+	@OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Course> courses = new ArrayList<>();
 
 }

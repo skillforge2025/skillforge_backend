@@ -1,9 +1,6 @@
 package com.skillforge.dto;
 
 import com.skillforge.entity.Role;
-import com.skillforge.entity.Student;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

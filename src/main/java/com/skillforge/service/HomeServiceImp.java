@@ -6,7 +6,7 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import com.skillforge.dao.HomeDao;
+import com.skillforge.dao.CourseDao;
 import com.skillforge.dto.CourseDTO;
 import com.skillforge.entity.Category;
 
@@ -18,12 +18,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class HomeServiceImp implements HomeService {
 	private final ModelMapper modelMapper;
-	private final HomeDao homeDao;
+	private final CourseDao courseDao;
 
 	@Override
 	public List<CourseDTO> courseList() {
 		// TODO Auto-generated method stub
-		List<CourseDTO> courses = homeDao.findAll().stream().map(course -> modelMapper.map(course, CourseDTO.class))
+		List<CourseDTO> courses = courseDao.getAllCourse().stream().map(course -> modelMapper.map(course, CourseDTO.class))
 				.toList();
 		return courses;
 	}

@@ -3,11 +3,15 @@ package com.skillforge.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,9 +41,10 @@ public class Course {
 	private Category category;
 	//owner
 	@ManyToOne
-	@JoinColumn(name="instructor_id")
+	@JoinColumn(name="instructor_id",nullable = false)
+	@JsonBackReference
 	private Instructor instructor;
 	
-	@OneToMany(mappedBy = "course",cascade = CascadeType.ALL,orphanRemoval = true)
+	@OneToMany(mappedBy = "course",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
 	private List<Content>contents=new ArrayList<>();
 }

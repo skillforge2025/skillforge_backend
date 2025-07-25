@@ -24,11 +24,11 @@ public class UserServiceImp implements UserService {
 	private ModelMapper modelMapper;
 
 	@Override
-	public ApiResponse registerUser(UserDTO userDto) {
+	public UserDTO registerUser(UserDTO userDto) {
 		System.out.println(userDto.getEmail() + userDto.getRole());
 		// TODO Auto-generated method stub
-		userDao.save(modelMapper.map(userDto, User.class));
-		return new ApiResponse("user created");
+		 User persistUser=userDao.save(modelMapper.map(userDto, User.class));
+		return modelMapper.map(persistUser,UserDTO.class);
 
 	}
 
