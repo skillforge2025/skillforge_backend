@@ -26,6 +26,7 @@ public class Instructor {
 	@MapsId
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User userDetails;
+	
 	private String expertise;
 	@Column(length = 500, nullable = true)
 	private String bio;

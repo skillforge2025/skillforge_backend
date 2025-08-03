@@ -2,6 +2,7 @@ package com.skillforge.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,4 +27,6 @@ public class HomeController {
 		public ResponseEntity<?> getCategories(){
 			return ResponseEntity.ok(homeService.categoryList());
 		}
+		
+		//for user details use student apis to show in header
 }

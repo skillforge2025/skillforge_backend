@@ -1,13 +1,21 @@
 package com.skillforge.service;
 
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import com.skillforge.apiresponse.ApiResponse;
+import com.skillforge.customexception.ResourceNotFoundException;
 import com.skillforge.customexception.UserNotFoundException;
 import com.skillforge.dao.StudentDao;
 import com.skillforge.dao.UserDao;
+import com.skillforge.dto.ContentRequestDTO;
 import com.skillforge.dto.PostStudentDTO;
 import com.skillforge.dto.StudentDTO;
+import com.skillforge.dto.UserDTO;
+import com.skillforge.entity.CoursePurchasedDetails;
 import com.skillforge.entity.Student;
 import com.skillforge.entity.User;
 
@@ -27,8 +35,9 @@ public class StudentServiceImp implements StudentService {
 	@Override
 	public StudentDTO studentDetails(Long id) {
 		Student student = studentDao.findById(id).orElseThrow(() -> new UserNotFoundException("user Not found"));
-
-		return modelMapper.map(student, StudentDTO.class);
+		StudentDTO studentDto = modelMapper.map(student, StudentDTO.class);
+		studentDto.setUserDetail(modelMapper.map(student.getUserDetail(), UserDTO.class));
+		return studentDto;
 	}
 
 	@Override
@@ -41,6 +50,15 @@ public class StudentServiceImp implements StudentService {
 		student.setCertification(studentDto.getCertification());
 		Student saved = studentDao.save(student);
 		return modelMapper.map(saved, StudentDTO.class);
+	}
+
+	@Override
+	public ApiResponse deleteStudent(Long userId) {
+		// TODO Auto-generated method stub
+		Student student = studentDao.findById(userId).orElseThrow(() -> new UserNotFoundException("user doen't exit"));
+		studentDao.delete(student);
+		userDao.delete(student.getUserDetail());
+		return new ApiResponse("user deleted successfully");
 	}
 
 }

@@ -1,5 +1,8 @@
 package com.skillforge.dto;
 
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +10,6 @@ import lombok.Setter;
 @Setter
 public class PostContentDTO {
 	private String tittle;
-	private String url;
 	private String description;
+	private MultipartFile videoFile;
 }

@@ -15,6 +15,6 @@ public class StudentDTO {
 	
 	private Long studentId;
 	private String certification;
-	private User userDetail;
+	private UserDTO userDetail;
 	List<CoursePurchasedDetails> courseList;
 }

@@ -1,4 +1,4 @@
-package com.skillforge.customexception;
+package com.skillforge.apiresponse;
 
 import java.time.LocalDateTime;
 

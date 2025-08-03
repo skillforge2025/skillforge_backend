@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,28 +22,28 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="courses")
+@Table(name = "courses")
 @Getter
 @Setter
 public class Course {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="course_id")
+	@Column(name = "course_id")
 	private Long courseId;
-	@Column(length = 100,nullable = false)
+	@Column(length = 100, nullable = false)
 	private String tittle;
-	
+
 	private Float duration;
 	private String description;
-	private double amount ;
+	private double amount;
 	@Enumerated(EnumType.STRING)
 	private Category category;
-	//owner
+	// owner
 	@ManyToOne
-	@JoinColumn(name="instructor_id",nullable = false)
+	@JoinColumn(name = "instructor_id", nullable = false)
 	@JsonBackReference
 	private Instructor instructor;
-	
-	@OneToMany(mappedBy = "course",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
-	private List<Content>contents=new ArrayList<>();
+
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private List<Content> contents = new ArrayList<>();
 }

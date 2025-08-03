@@ -1,11 +1,12 @@
 package com.skillforge.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import com.skillforge.customexception.ApiResponse;
+import com.skillforge.apiresponse.ApiResponse;
 import com.skillforge.customexception.ResourceNotFoundException;
 import com.skillforge.customexception.UserNotFoundException;
 import com.skillforge.dao.CourseDao;
@@ -15,6 +16,7 @@ import com.skillforge.dto.InstructorDTO;
 import com.skillforge.dto.PostContentDTO;
 import com.skillforge.dto.PostCourseDTO;
 import com.skillforge.dto.PostInstructorDTO;
+import com.skillforge.dto.UserDTO;
 import com.skillforge.entity.Content;
 import com.skillforge.entity.Course;
 import com.skillforge.entity.Instructor;
@@ -31,6 +33,7 @@ public class InstructorServiceImp implements InstructorService {
 	private final InstructorDao instructorDao;
 	private final UserDao userDao;
 	private final CourseDao courseDao;
+	private final VideoService videoServcie;
 	private final ModelMapper modelMapper;
 
 	@Override
@@ -52,7 +55,10 @@ public class InstructorServiceImp implements InstructorService {
 	public InstructorDTO getInstructorDetails(Long id) {
 		Instructor instuctor = instructorDao.findById(id)
 				.orElseThrow(() -> new UserNotFoundException("instructor not found"));
-		return modelMapper.map(instuctor, InstructorDTO.class);
+		UserDTO instructorInfo = modelMapper.map(instuctor.getUserDetails(), UserDTO.class);
+		InstructorDTO instructorDto = modelMapper.map(instuctor, InstructorDTO.class);
+		instructorDto.setUserDetails(instructorInfo);
+		return instructorDto;
 	}
 
 	@Override
@@ -84,12 +90,24 @@ public class InstructorServiceImp implements InstructorService {
 
 	@Override
 	public ApiResponse addCourseContent(Long courseId, PostContentDTO contentInfo) {
+		// secuiry + uploading video
 		Course course = courseDao.findById(courseId)
 				.orElseThrow(() -> new ResourceNotFoundException("course doesn't exit"));
-		System.out.println(course.getTittle());
+
 		Content content = modelMapper.map(contentInfo, Content.class);
+
 		content.setCourse(course);
-		course.getContents().add(content);
+		// add url link
+		String contentType = contentInfo.getVideoFile().getContentType();
+		try {
+			if (!contentType.equals("video/mp4") && !contentType.equals("video/mkv"))
+				throw new IllegalArgumentException("invalid file ,choose video file");
+			String url = videoServcie.uploadVideo(contentInfo.getVideoFile());// uploading video
+			content.setUrl(url);
+			course.getContents().add(content);
+		} catch (IllegalArgumentException | IOException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 		return new ApiResponse("content added successfully");
 	}
 

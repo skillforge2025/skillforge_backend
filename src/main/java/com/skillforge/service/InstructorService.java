@@ -1,6 +1,7 @@
 package com.skillforge.service;
 
-import com.skillforge.customexception.ApiResponse;
+
+import com.skillforge.apiresponse.ApiResponse;
 import com.skillforge.dto.InstructorDTO;
 import com.skillforge.dto.PostContentDTO;
 import com.skillforge.dto.PostCourseDTO;
@@ -11,7 +12,7 @@ public interface InstructorService {
 
 	InstructorDTO getInstructorDetails(Long id);
 
-	public ApiResponse addNewCourse(Long instructorId, PostCourseDTO courseDto);
+	 ApiResponse addNewCourse(Long instructorId, PostCourseDTO courseDto);
 
 	ApiResponse addCourseContent(Long courseId, PostContentDTO contentInfo);
 

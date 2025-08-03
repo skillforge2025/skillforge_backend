@@ -14,6 +14,6 @@ public class InstructorDTO {
 	private Long instructorId;
 	private String bio;
 	private String expertise;
-	private User userDetails;
+	private UserDTO userDetails;
 	private List<Course> courses;
 }

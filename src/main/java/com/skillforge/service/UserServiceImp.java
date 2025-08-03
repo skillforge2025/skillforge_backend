@@ -1,15 +1,17 @@
 package com.skillforge.service;
 
-import java.util.Optional;
+
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.stereotype.Service;
-import com.skillforge.controller.UserController;
-import com.skillforge.customexception.ApiResponse;
-import com.skillforge.customexception.UserNotFoundException;
+
+
+import com.skillforge.customexception.InvalidInputException;
 import com.skillforge.dao.UserDao;
-import com.skillforge.dto.LogInDTO;
-import com.skillforge.dto.UserDTO;
+import com.skillforge.dto.PostUserDTO;
+import com.skillforge.entity.Role;
 import com.skillforge.entity.User;
 
 import jakarta.transaction.Transactional;
@@ -22,33 +24,22 @@ public class UserServiceImp implements UserService {
 
 	private UserDao userDao;
 	private ModelMapper modelMapper;
+	private PasswordEncoder passwordEncoder;
 
 	@Override
-	public UserDTO registerUser(UserDTO userDto) {
+	public void registerUser(PostUserDTO userDto) {
 		System.out.println(userDto.getEmail() + userDto.getRole());
 		// TODO Auto-generated method stub
-		 User persistUser=userDao.save(modelMapper.map(userDto, User.class));
-		return modelMapper.map(persistUser,UserDTO.class);
-
+		if (userDao.existsByEmail(userDto.getEmail()))
+			throw new InvalidInputException("email already exists");
+		
+		userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+		User user=modelMapper.map(userDto, User.class);
+		user.setRole(Role.valueOf(userDto.getRole().toUpperCase()));
+		 userDao.save(user);
 	}
 
-	// use security here
-	@Override
-	public UserDTO getUserDetails(Long id) {
-		// TODO Auto-generated method stub
-		User user = userDao.findById(id).orElseThrow(() -> new UserNotFoundException("user not found check id"));
-		return modelMapper.map(user, UserDTO.class);
 
-	}
 
-	@Override
-	public UserDTO userInfo(LogInDTO credentials) {
-		Optional<User> user = userDao.findByEmail(credentials.getEmail());
-		if (user.isPresent() && user.get().getPassword().equals(credentials.getPassword())) // have to use security
-																							// hashing
-			return modelMapper.map(user.get(), UserDTO.class);
-
-		throw new UserNotFoundException("invalid credentials");
-	}
 
 }
