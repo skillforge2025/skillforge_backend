@@ -1,5 +1,8 @@
 package com.skillforge.controller;
 
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,12 +12,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.skillforge.apiresponse.ApiResponse;
 import com.skillforge.dto.LogInDTO;
@@ -26,6 +31,9 @@ import com.skillforge.security.JwtUtils;
 import com.skillforge.service.EmailService;
 import com.skillforge.service.UserService;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -47,6 +55,13 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("user created"));
 	}
 
+	@GetMapping
+	public ResponseEntity<?> getUserDetails(Authentication authentication) {
+		User user = (User) authentication.getPrincipal();
+		UserDTO userDto = modelMapper.map(user, UserDTO.class);
+		return ResponseEntity.ok(userDto);
+	}
+
 	@PostMapping("/login")
 	public ResponseEntity<?> logIn(@RequestBody LogInDTO credentials) {
 		Authentication authToken = new UsernamePasswordAuthenticationToken(credentials.getEmail(),
@@ -59,10 +74,12 @@ public class UserController {
 	}
 
 	@PatchMapping("/update")
-	public ResponseEntity<?>updateProfile(){
-		return null;
+	public ResponseEntity<?> updateProfile(@ModelAttribute MultipartFile picture) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String email = auth.getName();
+		return ResponseEntity.ok(userService.updateProfile(email, picture));
 	}
-	
+
 	@PostMapping("/email-login")
 	public ResponseEntity<?> logInByOtp(@RequestBody OtpCredentials credentials) {
 		boolean validate = emailService.validateOtp(credentials.getEmail(), credentials.getOtp());
@@ -80,4 +97,13 @@ public class UserController {
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("invalid otp"));
 	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+
+		request.getSession().invalidate();
+
+		return ResponseEntity.ok(new ApiResponse("log out successfully"));
+	}
+
 }

@@ -33,8 +33,13 @@ public class Course {
 	@Column(length = 100, nullable = false)
 	private String tittle;
 
-	private Float duration;
+	private double duration;
+
+	@Column(nullable = false)
+	private String thumbnail;
+	@Column(length = 200)
 	private String description;
+	@Column(nullable = false)
 	private double amount;
 	@Enumerated(EnumType.STRING)
 	private Category category;
@@ -43,7 +48,9 @@ public class Course {
 	@JoinColumn(name = "instructor_id", nullable = false)
 	@JsonBackReference
 	private Instructor instructor;
-
+	
+	@Column(name = "net_revenue")
+	private Double netRevenue;
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Content> contents = new ArrayList<>();
 }

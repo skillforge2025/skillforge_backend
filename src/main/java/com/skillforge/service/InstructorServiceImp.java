@@ -1,10 +1,10 @@
 package com.skillforge.service;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.skillforge.apiresponse.ApiResponse;
 import com.skillforge.customexception.ResourceNotFoundException;
@@ -12,6 +12,7 @@ import com.skillforge.customexception.UserNotFoundException;
 import com.skillforge.dao.CourseDao;
 import com.skillforge.dao.InstructorDao;
 import com.skillforge.dao.UserDao;
+import com.skillforge.dto.InstructorCourseResponseDTO;
 import com.skillforge.dto.InstructorDTO;
 import com.skillforge.dto.PostContentDTO;
 import com.skillforge.dto.PostCourseDTO;
@@ -35,20 +36,22 @@ public class InstructorServiceImp implements InstructorService {
 	private final CourseDao courseDao;
 	private final VideoService videoServcie;
 	private final ModelMapper modelMapper;
-
+private final UtilService utilService;
 	@Override
-	public InstructorDTO insertDetails(PostInstructorDTO instructorDto) {
-		User user = userDao.findById(instructorDto.getInstructorId())
-				.orElseThrow(() -> new UserNotFoundException("user doesn't exit"));
-		if (Role.valueOf("INSTRUCTOR").equals(user.getRole())) {
-			Instructor instructor = new Instructor();
-			instructor.setBio(instructorDto.getBio());
-			instructor.setExpertise(instructor.getExpertise());
-			instructor.setUserDetails(user);
-			Instructor persistInstructor = instructorDao.save(instructor);
-			return modelMapper.map(persistInstructor, InstructorDTO.class);
-		}
-		throw new UserNotFoundException("instructor doesn't exit");
+	public InstructorDTO insertDetails(String email, PostInstructorDTO instructorDto) {
+
+		User user = userDao.findByEmail(email)
+				.orElseThrow(() -> new UserNotFoundException("User with email " + email + " doesn't exist"));
+		user.setRole(Role.INSTRUCTOR);
+
+		Instructor instructor = new Instructor();
+		instructor.setBio(instructorDto.getBio());
+		instructor.setExpertise(instructorDto.getExpertise());
+		instructor.setUserDetails(user);
+
+		Instructor savedInstructor = instructorDao.save(instructor);
+
+		return modelMapper.map(savedInstructor, InstructorDTO.class);
 	}
 
 	@Override
@@ -68,13 +71,36 @@ public class InstructorServiceImp implements InstructorService {
 
 		Instructor instructor = instructorDao.findById(instructorId)
 				.orElseThrow(() -> new UserNotFoundException("instructor doesnt't exits"));
+		if (courseDto.getImage() == null)
+			throw new IllegalArgumentException("Thumbnail image is required");
+
+		
+		String imgUrl = videoServcie.uploadImage(courseDto.getImage());
+
 		Course course = modelMapper.map(courseDto, Course.class);
-//		course.setInstructor(instructor);
+		course.setThumbnail(imgUrl);
 		course.setInstructor(instructor);
-		instructor.getCourses().add(course);
-		instructorDao.save(instructor);
-//		courseDao.save(course);
-		return new ApiResponse("course created successfull add content");
+		double duration=0.0;
+//		for (PostContentDTO contentDto : courseDto.getContents()) {
+//			MultipartFile file = contentDto.getVideoFile();
+//			if (file == null || file.getContentType() == null)
+//				throw new IllegalArgumentException("Video file is required");
+//
+//			String contentType = file.getContentType();
+//			if (!contentType.equals("video/mp4") && !contentType.equals("video/x-matroska"))
+//				throw new IllegalArgumentException("Only .mp4 and .mkv videos allowed");
+//
+//			String videoUrl = videoServcie.uploadVideo(file);
+//			if (videoUrl == null || videoUrl.isBlank())
+//				throw new RuntimeException("Video upload failed");
+//			duration+=utilService.getVideoLengthInMinutes(file);
+//			Content content = modelMapper.map(contentDto, Content.class);
+//			content.setUrl(videoUrl);
+//			course.getContents().add(content);
+//		}
+		course.setDuration(duration);
+		courseDao.save(course);
+		return new ApiResponse("Course created successfully with contents");
 	}
 
 	// incomplete api
@@ -89,9 +115,9 @@ public class InstructorServiceImp implements InstructorService {
 	}
 
 	@Override
-	public ApiResponse addCourseContent(Long courseId, PostContentDTO contentInfo) {
+	public ApiResponse addCourseContent( PostContentDTO contentInfo) {
 		// secuiry + uploading video
-		Course course = courseDao.findById(courseId)
+		Course course = courseDao.findById(contentInfo.getCourseId())
 				.orElseThrow(() -> new ResourceNotFoundException("course doesn't exit"));
 
 		Content content = modelMapper.map(contentInfo, Content.class);
@@ -105,7 +131,7 @@ public class InstructorServiceImp implements InstructorService {
 			String url = videoServcie.uploadVideo(contentInfo.getVideoFile());// uploading video
 			content.setUrl(url);
 			course.getContents().add(content);
-		} catch (IllegalArgumentException | IOException e) {
+		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		return new ApiResponse("content added successfully");
@@ -120,5 +146,13 @@ public class InstructorServiceImp implements InstructorService {
 		if (!removed)
 			throw new ResourceNotFoundException("content doesn't exit");
 		return new ApiResponse("deleted successfully");
+	}
+
+	@Override
+	public List<InstructorCourseResponseDTO> getInstructorCourses(Long id) {
+		// TODO Auto-generated method stub
+		Instructor instructor=instructorDao.findById(id).orElseThrow(()->new UserNotFoundException("user doesn't exit"));
+		List<InstructorCourseResponseDTO>courses=instructor.getCourses().stream().map(course->modelMapper.map(course, InstructorCourseResponseDTO.class)).toList();
+		return courses;
 	}
 }

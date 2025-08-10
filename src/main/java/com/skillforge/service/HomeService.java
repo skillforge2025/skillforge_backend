@@ -8,5 +8,8 @@ public interface HomeService {
 
 	List<CourseDTO> courseList();
 	List<String>categoryList();
+	List<CourseDTO> courseByCategory(String category);
+	
+	List<CourseDTO> searchCourse(String courseName);
 	
 }

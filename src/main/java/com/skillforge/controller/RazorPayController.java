@@ -26,6 +26,7 @@ public class RazorPayController {
 	@PostMapping("/create-order")
 	public ResponseEntity<?> createOrder(@RequestBody PaymentOrderDTO request) {
 		try {
+			System.out.println("in create order " + request.getUserId() + request.getCourseId());
 			String order = razorPayService.createOrder(request.getAmount(), request.getCourseId().toString(),
 					request.getUserId().toString());
 			return ResponseEntity.ok(order);
@@ -35,16 +36,14 @@ public class RazorPayController {
 	}
 
 	@PostMapping("/verify-payment")
-	@PreAuthorize("hasRole('STUDENT')")
-	public ResponseEntity<?> verifyPayment(Authentication authencticated,
-			@RequestBody PaymentVerificationRequest request) {
-
+	public ResponseEntity<?> verifyPayment(@RequestBody PaymentVerificationRequest request) {
+System.out.println("in varification");
 		boolean isValid = razorPayService.verifySignature(request.getRazorpayOrderId(), request.getRazorpayPaymentId(),
 				request.getRazorpaySignature());
 		if (isValid) {
 			// 🔥 Add course to user
-			User user = (User) authencticated.getPrincipal();
-			return ResponseEntity.ok(purchaseService.purchaseCourse(user.getId(), request.getCourseId()));
+
+			return ResponseEntity.ok(purchaseService.purchaseCourse(request.getUserId(), request.getCourseId()));
 		}
 		return ResponseEntity.badRequest().body("Invalid user or course");
 	}

@@ -6,7 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PaymentOrderDTO {
-	private float amount;
-	private Long UserId;
+	
+	private int amount;
+	private Long userId;
 	private Long courseId;
 }

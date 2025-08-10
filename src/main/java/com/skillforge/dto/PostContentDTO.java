@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostContentDTO {
+	private Long courseId;
 	private String tittle;
 	private String description;
 	private MultipartFile videoFile;

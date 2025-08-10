@@ -1,5 +1,7 @@
 package com.skillforge.security;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,7 +14,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
 
 import lombok.AllArgsConstructor;
 
@@ -35,19 +39,31 @@ public class SecurityConfiguration {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		// 1. Disable CSRF protection
-		http.csrf(csrf -> csrf.disable());
+		 http
+         .cors(cors -> cors.configurationSource(request -> {
+             CorsConfiguration config = new CorsConfiguration();
+             config.setAllowedOrigins(List.of("*"));
+             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+             config.setAllowedHeaders(List.of("*"));
+             return config;
+         }))
+         .csrf(csrf -> csrf.disable())
+         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 		// 2. Authenticate any request
-		http.authorizeHttpRequests(request ->
-		// 5.permit all - swagger , view all restaurants , user signin , sign up....
-		request.requestMatchers("/swagger-ui/**", "/v**/api-docs/**", "/user/signup", "/user/login",
-				"/user/email-login", "/otp/send").permitAll().requestMatchers(HttpMethod.GET, "/").permitAll()
-				.requestMatchers(HttpMethod.GET, "/instructor").hasRole("INSTRUCTOR")
-				.requestMatchers(HttpMethod.POST, "/instructor").hasRole("INSTRUCTOR")
-				.requestMatchers(HttpMethod.GET, "/student").hasRole("STUDENT")
-				.requestMatchers(HttpMethod.POST, "/student").hasRole("STUDENT")
-				.requestMatchers(HttpMethod.GET, "/course").hasAnyRole("STUDENT", "INSTRUCTOR")
-				.requestMatchers(HttpMethod.GET, "/payment").hasRole("STUDENT").anyRequest().authenticated());
-		// 3. enable HTTP basic auth
+//		http.authorizeHttpRequests(request ->
+//		// 5.permit all - swagger , view all restaurants , user signin , sign up....
+//		request.requestMatchers("/swagger-ui/**", "/v**/api-docs/**", "/user/signup", "/user/login",
+//				"/user/email-login", "/otp/send","/payment/**").permitAll().requestMatchers(HttpMethod.GET, "/").permitAll()
+//				.requestMatchers(HttpMethod.GET, "/category/**").permitAll()
+//				.requestMatchers(HttpMethod.GET, "/categories").permitAll()
+//				
+//				.requestMatchers(HttpMethod.GET, "/instructor").hasRole("INSTRUCTOR")
+//				.requestMatchers(HttpMethod.POST, "/instructor").hasRole("INSTRUCTOR")
+//				.requestMatchers(HttpMethod.GET, "/student").hasRole("STUDENT")
+//				.requestMatchers(HttpMethod.POST, "/student").hasRole("STUDENT")
+//				.requestMatchers(HttpMethod.GET, "/course").hasAnyRole("STUDENT", "INSTRUCTOR")
+//				.requestMatchers(HttpMethod.GET, "/payment").hasRole("STUDENT").anyRequest().authenticated());
+//		// 3. enable HTTP basic auth
 		// http.httpBasic(Customizer.withDefaults());
 		// 4. set session creation policy - stateless
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -55,6 +71,7 @@ public class SecurityConfiguration {
 		http.addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class);
 		// 6. Customize error code of SC 401 , in case of authentication failure
 		http.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint));
+		
 		return http.build();
 	}
 

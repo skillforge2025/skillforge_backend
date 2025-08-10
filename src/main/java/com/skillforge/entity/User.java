@@ -33,6 +33,9 @@ public class User extends BaseEntity implements UserDetails {
 	@Column(length = 500, nullable = false)
 	@JsonIgnore
 	private String password;
+	@Column(nullable = true,name ="image_url")
+	private String imageUrl;
+	
 	@Column(name = "role")
 	@Enumerated(EnumType.STRING)
 	private Role role;

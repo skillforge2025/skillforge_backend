@@ -10,7 +10,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserDTO {
 	private String jwtToken;
+	private Long id;
 	private String userName;
 	private String email;
+	private String imageUrl;
 	private Role role;
 }

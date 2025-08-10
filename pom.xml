@@ -66,17 +66,17 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.4</version>
 		</dependency>
-<!--email for otp-->
-<dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter-mail</artifactId>
-</dependency>
+		<!--email for otp-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 		<!--web service s3 bucket -->
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>1.12.788</version>
-		</dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>s3</artifactId>
+    <version>2.29.30</version>
+</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -113,6 +113,13 @@
 			<artifactId>razorpay-java</artifactId>
 			<version>1.4.8</version>
 		</dependency>
+
+		<!--video content length-->
+		<dependency>
+    <groupId>ws.schild</groupId>
+    <artifactId>jave-core</artifactId>
+    <version>3.5.0</version>
+</dependency>
 	</dependencies>
 
 	<build>

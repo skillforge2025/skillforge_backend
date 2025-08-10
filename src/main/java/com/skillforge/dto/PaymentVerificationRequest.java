@@ -12,4 +12,6 @@ public class PaymentVerificationRequest {
 	private String razorpayOrderId;
 	private String razorpaySignature;
 	private Long courseId;
+	private Long userId;
+	private int amount;
 }

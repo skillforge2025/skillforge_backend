@@ -4,15 +4,13 @@ import java.util.List;
 
 import com.skillforge.entity.Category;
 import com.skillforge.entity.Content;
-import com.skillforge.entity.Instructor;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CourseDTO {
-
+public class InstructorCourseResponseDTO {
 	private Long courseId;
 	private String tittle;
 	private double duration;
