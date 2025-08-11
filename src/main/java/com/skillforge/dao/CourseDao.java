@@ -16,8 +16,6 @@ public interface CourseDao extends JpaRepository<Course, Long> {
 	List<Course> getAllCourse();
 
 	List<Course> findAllByCategory(Category category);
-	@Query("SELECT c FROM Course  c WHERE LOWER(c.tittle) LIKE LOWER(CONCAT('%', :courseName, '%'))")
-	List<Course> findAllByTittle( String courseName);
-
-
+	@Query("SELECT c FROM Course c WHERE LOWER(c.tittle) LIKE LOWER(CONCAT('%', :courseName, '%'))")
+    List<Course> searchByTittle(@Param("courseName") String courseName);
 }

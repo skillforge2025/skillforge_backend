@@ -39,7 +39,7 @@ public class HomeController {
 	// for user details use student apis to show in header
 	
 	@GetMapping("/course/search/{courseName}")
-	public ResponseEntity<?>searchCouses(@PathVariable String courseName){
+	public ResponseEntity<?>searchCourses(@PathVariable String courseName){
 		System.out.println("in course");
 		return ResponseEntity.ok(homeService.searchCourse(courseName));
 	}

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.skillforge.dao.CourseDao;
 import com.skillforge.dto.CourseDTO;
 import com.skillforge.entity.Category;
+import com.skillforge.entity.Course;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -50,13 +51,14 @@ public class HomeServiceImp implements HomeService {
 
 	@Override
 	public List<CourseDTO> searchCourse(String courseName) {
-		List<CourseDTO> courses = courseDao.findAllByTittle(courseName).stream()
-				.map(course -> modelMapper.map(course, CourseDTO.class)).toList();
-		for(CourseDTO c:courses) {
+		System.out.println("Searching for: " + courseName); // DEBUG
+		List<Course> courses = courseDao.searchByTittle(courseName);
+		for (Course c : courses) {
 			System.out.println(c.getTittle());
 		}
-		return courses;
+		List<CourseDTO> co = courses.stream().map(course -> modelMapper.map(course, CourseDTO.class)).toList();
+		courses.forEach(c -> System.out.println(c.getTittle()));
+		return co;
 	}
 
-	
 }
